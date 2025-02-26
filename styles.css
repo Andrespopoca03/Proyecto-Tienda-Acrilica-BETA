@@ -1,0 +1,96 @@
+/* 
+  styles.css (Hoja de estilos global)
+  Ajusta los valores de la paleta de colores, la tipografía, etc.
+*/
+
+/* Paleta de colores (inspirada en Khaki Web) */
+:root {
+  --color-dark1: #0A0F0F;   /* Muy oscuro */
+  --color-dark2: #2B2B2B;   /* Gris oscuro */
+  --color-light1: #EAE0D5;  /* Tonalidad crema */
+  --color-light2: #CAC4AF;  /* Khaki claro */
+  --color-light3: #B5B19F;  /* Otro tono khaki */
+}
+
+/* RESET BÁSICO */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Playfair Display', serif;
+  background-color: var(--color-light1);
+  color: var(--color-dark1);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Sección Hero (imagen de fondo + texto centrado) */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* Ocupa toda la altura de la ventana */
+  background: url("https://via.placeholder.com/1920x1080.jpg?text=Fondo+Khaki") 
+              no-repeat center center/cover;
+  /* Reemplaza la URL de la imagen por la tuya */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Contenedor del texto sobre la imagen */
+.hero-content {
+  background-color: rgba(10, 15, 15, 0.4); /* Fondo semitransparente */
+  padding: 2rem;
+  border-radius: 8px;
+  color: var(--color-light1); /* Texto claro sobre el fondo oscuro */
+  max-width: 600px;
+}
+
+/* Título principal */
+.hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+/* Eslogan */
+.hero-content p {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  font-weight: 400;
+}
+
+/* Botón para explorar */
+.hero-content .btn {
+  display: inline-block;
+  background-color: var(--color-dark1);
+  color: var(--color-light1);
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  font-weight: 400;
+}
+
+.hero-content .btn:hover {
+  background-color: var(--color-dark2);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+  .hero-content p {
+    font-size: 0.95rem;
+  }
+  .hero-content {
+    padding: 1.5rem;
+  }
+}

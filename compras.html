@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finalizar Compras - Ejemplo Web</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <!-- Librería QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    /* Estilos generales y reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Lato', sans-serif;
+    }
+    :root {
+      --primary-black: #000;
+      --secondary-black: #333;
+      --white: #fff;
+      --bg-gray: #f7f7f7;
+      --heading-font: 'Playfair Display', serif;
+    }
+    body {
+      background: var(--bg-gray);
+      color: var(--primary-black);
+    }
+    /* Navbar interactivo */
+    .navbar {
+      background: var(--white);
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--secondary-black);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar a {
+      color: var(--primary-black);
+      text-decoration: none;
+      font-family: var(--heading-font);
+      font-size: 1.8rem;
+      font-weight: 500;
+    }
+    /* Contenedor principal */
+    .container {
+      max-width: 800px;
+      margin: 100px auto;
+      background: var(--white);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-family: var(--heading-font);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .cart-summary {
+      margin-bottom: 2rem;
+    }
+    .cart-summary ul {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+    .cart-summary ul li {
+      margin-bottom: 0.5rem;
+    }
+    .total {
+      font-weight: bold;
+      margin-top: 1rem;
+      text-align: right;
+    }
+    .payment-method {
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .payment-method label {
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    /* Contenedor del formulario de tarjeta */
+    #card-form {
+      display: none;
+      margin-bottom: 2rem;
+      background: #fafafa;
+      padding: 1rem;
+      border-radius: 5px;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+    #card-form h3 {
+      margin-bottom: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    /* Vista previa de la tarjeta */
+    .card-preview {
+      width: 300px;
+      height: 180px;
+      background: linear-gradient(135deg, #0a2463, #3a7ca5);
+      border-radius: 10px;
+      color: var(--white);
+      padding: 1rem;
+      margin: 0 auto 1rem auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-number {
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+    .card-holder {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-name {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      max-width: 70%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .card-expiry-cvc {
+      text-align: right;
+    }
+    /* Contenedor QR para Pago en Efectivo */
+    #qr-container {
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
+    }
+    #qrcode-efectivo { margin: 0 auto; }
+    /* Botón de Pagar */
+    #pay-btn {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--primary-black);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #pay-btn:hover {
+      background: var(--secondary-black);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar interactivo -->
+  <nav class="navbar">
+    <a href="index.html">Ejemplo Web</a>
+  </nav>
+
+  <div class="container">
+    <h1>Finalizar Compras</h1>
+
+    <!-- Resumen del pedido -->
+    <div class="cart-summary">
+      <h2>Resumen de tu Pedido</h2>
+      <ul id="cart-items-summary"><!-- Productos añadidos --></ul>
+      <p class="total" id="total-amount">Total: $0.00</p>
+    </div>
+
+    <!-- Métodos de pago -->
+    <div class="payment-method">
+      <h2>Elige tu método de pago</h2>
+      <label>
+        <input type="radio" name="payment" value="paypal" checked>
+        PayPal
+      </label>
+      <label>
+        <input type="radio" name="payment" value="tarjeta">
+        Tarjeta de Crédito/Débito
+      </label>
+      <label>
+        <input type="radio" name="payment" value="efectivo">
+        Pago en Efectivo
+      </label>
+    </div>
+
+    <!-- Formulario para Tarjeta -->
+    <div id="card-form">
+      <h3>Datos de Tarjeta</h3>
+      <!-- Vista previa de la tarjeta -->
+      <div class="card-preview">
+        <div class="card-number" id="preview-number">#### #### #### ####</div>
+        <div class="card-holder">
+          <div class="card-name" id="preview-name">NOMBRE APELLIDO</div>
+          <div class="card-expiry-cvc">
+            <div id="preview-expiry">MM/YY</div>
+            <div id="preview-cvc">CVC</div>
+          </div>
+        </div>
+      </div>
+      <!-- Campos del formulario -->
+      <div class="form-group">
+        <label for="card-number-input">Número de Tarjeta</label>
+        <input type="text" id="card-number-input" maxlength="19" placeholder="#### #### #### ####">
+      </div>
+      <div class="form-group">
+        <label for="card-name-input">Nombre en la Tarjeta</label>
+        <input type="text" id="card-name-input" placeholder="Ej. Juan Pérez">
+      </div>
+      <div class="form-group">
+        <label for="card-expiry-input">Fecha de Expiración (MM/YY)</label>
+        <input type="text" id="card-expiry-input" maxlength="5" placeholder="MM/YY">
+      </div>
+      <div class="form-group">
+        <label for="card-cvc-input">CVC</label>
+        <input type="text" id="card-cvc-input" maxlength="4" placeholder="CVC">
+      </div>
+    </div>
+
+    <!-- Contenedor QR para Pago en Efectivo -->
+    <div id="qr-container">
+      <h3>QR para Pago en Efectivo</h3>
+      <div id="qrcode-efectivo"></div>
+    </div>
+
+    <!-- Botón de Pagar -->
+    <button id="pay-btn">Pagar</button>
+  </div>
+
+  <script>
+    /************ 1) Cargar Carrito y Mostrar Resumen ************/
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartSummaryEl = document.getElementById('cart-items-summary');
+    const totalAmountEl = document.getElementById('total-amount');
+    let total = 0;
+    cart.forEach(item => {
+      total += item.price;
+      const li = document.createElement('li');
+      li.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+      cartSummaryEl.appendChild(li);
+    });
+    totalAmountEl.textContent = `Total: $${total.toFixed(2)}`;
+
+    /************ 2) Función para Generar el QR para Efectivo ************/
+    function generarQREfectivo() {
+      const totalText = totalAmountEl.textContent;
+      const qrElement = document.getElementById("qrcode-efectivo");
+      qrElement.innerHTML = ""; // Limpiar QR existente
+      try {
+        new QRCode(qrElement, {
+          text: `Pago Efectivo: ${totalText}`,
+          width: 128,
+          height: 128,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+        console.log('QR generado correctamente');
+      } catch (error) {
+        console.error('Error al generar el QR:', error);
+      }
+    }
+
+    /************ 3) Manejo de Métodos de Pago ************/
+    const paymentRadios = document.querySelectorAll('input[name="payment"]');
+    const qrContainer = document.getElementById('qr-container');
+    const cardForm = document.getElementById('card-form');
+
+    paymentRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        const metodo = radio.value;
+        if (metodo === 'efectivo') {
+          qrContainer.style.display = 'block';
+          cardForm.style.display = 'none';
+          generarQREfectivo();
+        } else {
+          qrContainer.style.display = 'none';
+          document.getElementById("qrcode-efectivo").innerHTML = "";
+          if (metodo === 'tarjeta') {
+            cardForm.style.display = 'block';
+          } else {
+            cardForm.style.display = 'none';
+          }
+        }
+      });
+    });
+
+    /************ 4) Vista Previa Dinámica de la Tarjeta ************/
+    const cardNumberInput = document.getElementById('card-number-input');
+    const cardNameInput = document.getElementById('card-name-input');
+    const cardExpiryInput = document.getElementById('card-expiry-input');
+    const cardCvcInput = document.getElementById('card-cvc-input');
+
+    const previewNumber = document.getElementById('preview-number');
+    const previewName = document.getElementById('preview-name');
+    const previewExpiry = document.getElementById('preview-expiry');
+    const previewCvc = document.getElementById('preview-cvc');
+
+    cardNumberInput.addEventListener('input', () => {
+      let value = cardNumberInput.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+      let formattedValue = value.replace(/(.{4})/g, '$1 ');
+      cardNumberInput.value = formattedValue.trim();
+      previewNumber.textContent = formattedValue || '#### #### #### ####';
+    });
+
+    cardNameInput.addEventListener('input', () => {
+      previewName.textContent = cardNameInput.value.toUpperCase() || 'NOMBRE APELLIDO';
+    });
+
+    cardExpiryInput.addEventListener('input', () => {
+      let value = cardExpiryInput.value.replace(/\s+/g, '').replace(/[^0-9/]/g, '');
+      if (value.length === 2 && !value.includes('/')) {
+        value = value + '/';
+      }
+      cardExpiryInput.value = value;
+      previewExpiry.textContent = value || 'MM/YY';
+    });
+
+    cardCvcInput.addEventListener('input', () => {
+      let value = cardCvcInput.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+      cardCvcInput.value = value;
+      previewCvc.textContent = value || 'CVC';
+    });
+
+    /************ 5) Botón de Pagar y Limpieza del Carrito ************/
+    document.getElementById('pay-btn').addEventListener('click', () => {
+      const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+      alert(`Método de pago seleccionado: ${selectedPayment}\nTotal a pagar: $${total.toFixed(2)}`);
+      // Al finalizar la compra, se limpia el carrito
+      localStorage.removeItem('cart');
+      // Redirigir al inicio (o página de agradecimiento)
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

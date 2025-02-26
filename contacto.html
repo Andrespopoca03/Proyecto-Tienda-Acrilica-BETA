@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacto - Ejemplo Web</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset y base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Lato', sans-serif;
+    }
+    :root {
+      --primary-black: #000;
+      --secondary-black: #333;
+      --white: #fff;
+      --bg-gray: #f7f7f7;
+      --heading-font: 'Playfair Display', serif;
+    }
+    body {
+      background: var(--bg-gray);
+      color: var(--primary-black);
+    }
+    /* Navbar interactivo */
+    .navbar {
+      background: var(--white);
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--secondary-black);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar a {
+      color: var(--primary-black);
+      text-decoration: none;
+      font-family: var(--heading-font);
+      font-size: 1.8rem;
+      font-weight: 500;
+    }
+    /* Contenedor principal */
+    .container {
+      max-width: 800px;
+      margin: 100px auto;
+      background: var(--white);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-family: var(--heading-font);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .contact-info {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .contact-info p {
+      margin-bottom: 0.5rem;
+    }
+    /* Formulario de contacto */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    form .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    form .form-group label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    form .form-group input,
+    form .form-group textarea {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    form .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    #submit-btn {
+      padding: 0.75rem;
+      background: var(--primary-black);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #submit-btn:hover {
+      background: var(--secondary-black);
+    }
+    /* Sección Quienes Somos y Tarjeta de Presentación */
+    .quienes-somos {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .quienes-somos h2 {
+      font-family: var(--heading-font);
+      margin-bottom: 1rem;
+    }
+    .presentation-card {
+      background: var(--white);
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 1rem;
+      margin: 0 auto;
+      max-width: 400px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+    .presentation-card .profile-img {
+      width: 100%;
+      max-width: 150px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .presentation-card p {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    @media (max-width: 600px) {
+      .container {
+        margin: 50px 1rem;
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar interactivo -->
+  <nav class="navbar">
+    <a href="index.html">Ejemplo Web</a>
+  </nav>
+
+  <div class="container">
+    <h1>Contacto</h1>
+    <div class="contact-info">
+      <p><i class="fas fa-map-marker-alt"></i> Calle Falsa 123, Ciudad, País</p>
+      <p><i class="fas fa-phone"></i> +123 456 7890</p>
+      <p><i class="fas fa-envelope"></i> contacto@ejemploweb.com</p>
+    </div>
+    <form id="contact-form">
+      <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Correo Electrónico:</label>
+        <input type="email" id="email" name="email" placeholder="tuemail@ejemplo.com" required>
+      </div>
+      <div class="form-group">
+        <label for="asunto">Asunto:</label>
+        <input type="text" id="asunto" name="asunto" placeholder="Asunto de tu mensaje" required>
+      </div>
+      <div class="form-group">
+        <label for="mensaje">Mensaje:</label>
+        <textarea id="mensaje" name="mensaje" placeholder="Escribe tu mensaje aquí..." required></textarea>
+      </div>
+      <button type="submit" id="submit-btn">Enviar Mensaje</button>
+    </form>
+
+    <!-- Sección "Quienes Somos" con Tarjeta de Presentación -->
+    <div class="quienes-somos">
+      <h2>Quienes Somos</h2>
+      <div class="presentation-card">
+        <img src="img/e.jpg" alt="Foto de Presentación" class="profile-img">
+        <p>
+          Somos un equipo comprometido con la excelencia y la innovación. Nuestro objetivo es brindar soluciones de alta calidad y servicio personalizado para cada uno de nuestros clientes.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Manejo del formulario de contacto
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Aquí se integraría la lógica de envío a un servidor o servicio de email.
+      alert('Mensaje enviado. Gracias por contactarnos.');
+      this.reset();
+    });
+  </script>
+</body>
+</html>

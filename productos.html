@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos - Ejemplo Web</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset y tipografías */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Lato', sans-serif; }
+    :root {
+      --primary-black: #000;
+      --secondary-black: #333;
+      --white: #fff;
+      --bg-gray: #f7f7f7;
+      --heading-font: 'Playfair Display', serif;
+    }
+    body { background: var(--bg-gray); color: var(--primary-black); }
+    /* Navbar */
+    .navbar {
+      background: var(--white);
+      padding: 1rem 2rem;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1100;
+      border-bottom: 1px solid var(--secondary-black);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-content { display: flex; align-items: center; gap: 1.5rem; width: 100%; }
+    .hamburger, .cart-icon { font-size: 1.8rem; cursor: pointer; color: var(--primary-black); }
+    .logo {
+      color: var(--primary-black);
+      font-family: var(--heading-font);
+      font-size: 1.8rem;
+      font-weight: 500;
+      text-decoration: none;
+      flex-grow: 1;
+    }
+    /* Sidebar de navegación */
+    .sidebar {
+      position: fixed;
+      left: -300px;
+      top: 0;
+      height: 100vh;
+      width: 280px;
+      background: var(--white);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2000;
+      padding: 2rem;
+      border-right: 1px solid var(--secondary-black);
+      border-radius: 0 15px 15px 0;
+    }
+    .sidebar.active { left: 0; }
+    .close-btn {
+      color: var(--primary-black);
+      font-size: 2rem;
+      cursor: pointer;
+      position: absolute;
+      right: 1.5rem;
+      top: 1rem;
+      transition: all 0.3s ease;
+    }
+    .close-btn:hover { transform: rotate(90deg); }
+    .sidebar-links {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .sidebar-links a {
+      color: var(--primary-black);
+      text-decoration: none;
+      font-size: 1.1rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .sidebar-links a:hover {
+      background: rgba(0, 0, 0, 0.05);
+      transform: translateX(10px);
+    }
+    /* Sidebar del Carrito */
+    .cart-sidebar {
+      position: fixed;
+      right: -350px;
+      top: 0;
+      width: 300px;
+      height: 100vh;
+      background: var(--white);
+      box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+      padding: 2rem;
+      transition: all 0.4s ease;
+      z-index: 2100;
+      overflow-y: auto;
+    }
+    .cart-sidebar.active { right: 0; }
+    .cart-sidebar .close-cart {
+      font-size: 2rem;
+      cursor: pointer;
+      color: var(--primary-black);
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      transition: all 0.3s ease;
+    }
+    .cart-sidebar h3 {
+      font-family: var(--heading-font);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    #cart-items { list-style: none; margin-bottom: 1rem; }
+    #cart-items li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #ddd;
+    }
+    #cart-items li span { font-size: 0.9rem; }
+    #cart-items li .remove-item {
+      background: transparent;
+      border: none;
+      color: var(--secondary-black);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    #cart-total { font-weight: bold; text-align: center; margin-top: 1rem; }
+    /* Botón de Finalizar Compras */
+    #checkout-btn {
+      display: block;
+      width: 100%;
+      margin-top: 1rem;
+      background: var(--primary-black);
+      color: var(--white);
+      border: none;
+      padding: 0.75rem;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #checkout-btn:hover { background: var(--secondary-black); }
+    /* Contenido Principal */
+    .main-content {
+      margin-top: 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: flex;
+      gap: 2rem;
+    }
+    /* Filtro de Categorías */
+    .filter {
+      width: 250px;
+      background: var(--white);
+      padding: 1rem;
+      border: 1px solid var(--secondary-black);
+      border-radius: 10px;
+      height: fit-content;
+    }
+    .filter h3 { font-family: var(--heading-font); margin-bottom: 1rem; }
+    .filter ul { list-style: none; }
+    .filter ul li { margin-bottom: 0.5rem; }
+    .filter ul li a {
+      color: var(--primary-black);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .filter ul li a:hover { color: var(--secondary-black); }
+    /* Sección de Productos */
+    .products { flex: 1; }
+    .search-container { margin-bottom: 1.5rem; text-align: right; }
+    #search-bar {
+      width: 100%;
+      max-width: 300px;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--secondary-black);
+      border-radius: 5px;
+      outline: none;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    .product-card {
+      background: var(--white);
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .product-card img { width: 100%; height: auto; display: block; }
+    .product-info { padding: 1rem; text-align: center; }
+    .product-info h4 { font-family: var(--heading-font); margin-bottom: 0.5rem; }
+    .product-info p { margin-bottom: 0.5rem; color: var(--secondary-black); }
+    .product-info .price { font-weight: bold; margin-bottom: 1rem; }
+    .product-info .add-to-cart {
+      background: var(--primary-black);
+      color: var(--white);
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      font-size: 0.9rem;
+    }
+    .product-info .add-to-cart:hover { background: var(--secondary-black); }
+    /* Paginación */
+    .pagination {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .pagination a {
+      margin: 0 0.5rem;
+      color: var(--primary-black);
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--secondary-black);
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    .pagination a:hover {
+      background: var(--secondary-black);
+      color: var(--white);
+    }
+    @media (max-width: 768px) {
+      .main-content { flex-direction: column; padding: 1rem; }
+      .filter { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-content">
+      <div class="hamburger"><i class="fas fa-bars"></i></div>
+      <a href="index.html" class="logo">Ejemplo Web</a>
+      <div class="cart-icon"><i class="fas fa-shopping-cart"></i></div>
+    </div>
+  </nav>
+
+  <!-- Sidebar de navegación -->
+  <div class="sidebar">
+    <div class="close-btn">×</div>
+    <div class="sidebar-links">
+      <a href="index.html">Inicio</a>
+      <a href="productos.html">Productos</a>
+      <a href="ofertas.html">Ofertas</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+  </div>
+
+  <!-- Sidebar del Carrito -->
+  <div id="cart-sidebar" class="cart-sidebar">
+    <div class="close-cart">×</div>
+    <h3>Carrito de Compras</h3>
+    <ul id="cart-items"><!-- Items añadidos dinámicamente --></ul>
+    <p id="cart-total">Total: $0.00</p>
+    <button id="checkout-btn">Finalizar Compras</button>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="main-content">
+    <!-- Filtro de Categorías -->
+    <aside class="filter">
+      <h3>Categorías</h3>
+      <ul>
+        <li><a href="#">Acrílicos</a></li>
+        <li><a href="#">Esmaltes</a></li>
+        <li><a href="#">Decoración</a></li>
+        <li><a href="#">Cuidado</a></li>
+      </ul>
+    </aside>
+
+    <!-- Sección de Productos -->
+    <section class="products">
+      <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Buscar productos...">
+      </div>
+      <div class="products-grid">
+        <div class="product-card" data-name="Producto Acrílico 1" data-price="20.00">
+          <img src="img/p1.jpg" alt="Producto Acrílico 1">
+          <div class="product-info">
+            <h4>Producto Acrílico 1</h4>
+            <p class="price">$20.00</p>
+            <button class="add-to-cart">Añadir al Carrito</button>
+          </div>
+        </div>
+        <div class="product-card" data-name="Producto Acrílico 2" data-price="22.50">
+          <img src="img/p2.jpg" alt="Producto Acrílico 2">
+          <div class="product-info">
+            <h4>Producto Acrílico 2</h4>
+            <p class="price">$22.50</p>
+            <button class="add-to-cart">Añadir al Carrito</button>
+          </div>
+        </div>
+        <div class="product-card" data-name="Producto Acrílico 3" data-price="18.00">
+          <img src="img/p3.jpg" alt="Producto Acrílico 3">
+          <div class="product-info">
+            <h4>Producto Acrílico 3</h4>
+            <p class="price">$18.00</p>
+            <button class="add-to-cart">Añadir al Carrito</button>
+          </div>
+        </div>
+        <div class="product-card" data-name="Producto Acrílico 4" data-price="25.00">
+          <img src="img/p4.jpg" alt="Producto Acrílico 4">
+          <div class="product-info">
+            <h4>Producto Acrílico 4</h4>
+            <p class="price">$25.00</p>
+            <button class="add-to-cart">Añadir al Carrito</button>
+          </div>
+        </div>
+        <!-- Se pueden agregar más productos siguiendo el mismo formato -->
+      </div>
+      <!-- Paginación -->
+      <div class="pagination">
+        <a href="#">&laquo;</a>
+        <a href="#" class="active">1</a>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#">&raquo;</a>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Funcionalidad del Sidebar de navegación
+    document.querySelector('.hamburger').addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.add('active');
+    });
+    document.querySelector('.close-btn').addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.remove('active');
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.sidebar') && 
+          !e.target.closest('.hamburger') &&
+          document.querySelector('.sidebar').classList.contains('active')) {
+        document.querySelector('.sidebar').classList.remove('active');
+      }
+    });
+    document.querySelectorAll('.sidebar-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('.sidebar').classList.remove('active');
+      });
+    });
+
+    // Funcionalidad de la barra de búsqueda dinámica
+    const searchBar = document.getElementById('search-bar');
+    searchBar.addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      const products = document.querySelectorAll('.product-card');
+      products.forEach(product => {
+        const name = product.getAttribute('data-name').toLowerCase();
+        product.style.display = name.includes(filter) ? '' : 'none';
+      });
+    });
+
+    // Funcionalidad del carrito de compras
+    let cart = [];
+    const cartIcon = document.querySelector('.cart-icon');
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const closeCartBtn = document.querySelector('.close-cart');
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartTotalEl = document.getElementById('cart-total');
+    const checkoutBtn = document.getElementById('checkout-btn');
+
+    // Mostrar/ocultar carrito
+    cartIcon.addEventListener('click', () => {
+      cartSidebar.classList.add('active');
+    });
+    closeCartBtn.addEventListener('click', () => {
+      cartSidebar.classList.remove('active');
+    });
+
+    // Agregar producto al carrito
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+      button.addEventListener('click', function() {
+        const productCard = this.closest('.product-card');
+        const name = productCard.getAttribute('data-name');
+        const price = parseFloat(productCard.getAttribute('data-price'));
+        // Se puede agregar lógica para evitar duplicados o aumentar cantidad
+        cart.push({ name, price });
+        updateCartUI();
+      });
+    });
+
+    // Actualizar interfaz del carrito y guardar en localStorage
+    function updateCartUI() {
+      cartItemsContainer.innerHTML = '';
+      let total = 0;
+      cart.forEach((item, index) => {
+        total += item.price;
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${item.name} - $${item.price.toFixed(2)}</span>
+                        <button class="remove-item" data-index="${index}">&times;</button>`;
+        cartItemsContainer.appendChild(li);
+      });
+      cartTotalEl.textContent = `Total: $${total.toFixed(2)}`;
+      localStorage.setItem('cart', JSON.stringify(cart));
+      // Asignar eventos a los botones de eliminar
+      document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', function() {
+          const index = this.getAttribute('data-index');
+          cart.splice(index, 1);
+          updateCartUI();
+        });
+      });
+    }
+
+    // Botón para finalizar compras
+    checkoutBtn.addEventListener('click', () => {
+      // Redirige a la página de compras
+      window.location.href = 'compras.html';
+    });
+  </script>
+</body>
+</html>

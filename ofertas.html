@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ofertas - Ejemplo Web</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset y configuración base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Lato', sans-serif;
+    }
+    :root {
+      --primary-black: #000;
+      --secondary-black: #333;
+      --white: #fff;
+      --bg-gray: #f7f7f7;
+      --accent: #e74c3c;
+      --heading-font: 'Playfair Display', serif;
+    }
+    body {
+      background: linear-gradient(135deg, #f7f7f7, #eaeaea);
+      color: var(--primary-black);
+      overflow-x: hidden;
+    }
+    /* Navbar */
+    .navbar {
+      background: var(--white);
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--secondary-black);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .navbar a {
+      color: var(--primary-black);
+      text-decoration: none;
+      font-family: var(--heading-font);
+      font-size: 1.8rem;
+      font-weight: 500;
+    }
+    .cart-icon {
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+    /* Contenedor principal */
+    .container {
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 2rem;
+    }
+    h1 {
+      font-family: var(--heading-font);
+      margin-bottom: 2rem;
+      text-align: center;
+      color: var(--accent);
+      font-size: 2.5rem;
+    }
+    /* Barra de búsqueda */
+    .search-container {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    #search-bar {
+      width: 100%;
+      max-width: 400px;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--secondary-black);
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    /* Grid de ofertas */
+    .offers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .offer-card {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      transform: translateY(20px);
+      opacity: 0;
+      animation: fadeInUp 0.8s forwards;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    /* Animación escalonada */
+    .offer-card:nth-child(1) { animation-delay: 0.2s; }
+    .offer-card:nth-child(2) { animation-delay: 0.4s; }
+    .offer-card:nth-child(3) { animation-delay: 0.6s; }
+    .offer-card:hover {
+      transform: translateY(0);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Badge de oferta */
+    .badge {
+      position: absolute;
+      top: 10px;
+      left: -40px;
+      background: var(--accent);
+      color: var(--white);
+      padding: 5px 20px;
+      font-weight: bold;
+      transform: rotate(-45deg);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      animation: slideIn 0.5s forwards;
+    }
+    @keyframes slideIn {
+      from { left: -100px; opacity: 0; }
+      to { left: -40px; opacity: 1; }
+    }
+    .offer-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+    }
+    .offer-card img:hover {
+      transform: scale(1.05);
+    }
+    .offer-details h3 {
+      font-family: var(--heading-font);
+      margin-bottom: 0.5rem;
+      font-size: 1.5rem;
+    }
+    .offer-details p {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+    .original-price {
+      text-decoration: line-through;
+      color: var(--secondary-black);
+    }
+    .discounted-price {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary-black);
+    }
+    .offer-details button.add-to-cart {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--primary-black);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .offer-details button.add-to-cart:hover {
+      background: var(--secondary-black);
+    }
+    /* Countdown Timer */
+    .countdown {
+      margin-top: 1rem;
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--accent);
+      transition: all 0.3s ease;
+    }
+    /* Cart Sidebar */
+    .cart-sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 300px;
+      height: 100%;
+      background: var(--white);
+      box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+      padding: 2rem;
+      transition: transform 0.4s ease;
+      z-index: 200;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html">Ejemplo Web</a>
+    <div class="cart-icon"><i class="fas fa-shopping-cart"></i></div>
+  </nav>
+
+  <div class="container">
+    <h1>Ofertas Especiales</h1>
+    <div class="search-container">
+      <input type="text" id="search-bar" placeholder="Buscar ofertas...">
+    </div>
+    <div class="offers-grid">
+      <!-- Oferta 1: Oferta de 24 horas -->
+      <div class="offer-card" data-name="Producto A">
+        <div class="badge">¡Oferta!</div>
+        <img src="img/p5.jpg" alt="Oferta 1">
+        <div class="offer-details">
+          <h3>Producto A - 20% OFF</h3>
+          <p class="original-price">$100.00</p>
+          <p class="discounted-price">$80.00</p>
+          <div class="countdown" data-duration="24"></div>
+          <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+      </div>
+      <!-- Oferta 2: Oferta de 48 horas -->
+      <div class="offer-card" data-name="Producto B">
+        <div class="badge">¡Oferta!</div>
+        <img src="img/p6.jpg" alt="Oferta 2">
+        <div class="offer-details">
+          <h3>Producto B - 30% OFF</h3>
+          <p class="original-price">$200.00</p>
+          <p class="discounted-price">$140.00</p>
+          <div class="countdown" data-duration="48"></div>
+          <button class="add-to-cart">Agregar al Carrito</button>
+        </div>
+      </div>
+      <!-- Más ofertas pueden agregarse aquí -->
+    </div>
+  </div>
+
+  <!-- Cart Sidebar -->
+  <div id="cart-sidebar" class="cart-sidebar" style="transform: translateX(100%);">
+    <div class="close-cart" style="cursor:pointer; font-size: 1.5rem; position:absolute; top:10px; right:10px;">×</div>
+    <h3>Carrito de Compras</h3>
+    <ul id="cart-items"></ul>
+    <p id="cart-total">Total: $0.00</p>
+    <button id="checkout-btn" style="width:100%; padding:0.75rem; background:var(--primary-black); color:var(--white); border:none; border-radius:5px; cursor:pointer;">Finalizar Compra</button>
+  </div>
+
+  <script>
+    /************ Barra de Búsqueda ************/
+    const searchBar = document.getElementById('search-bar');
+    searchBar.addEventListener('input', function() {
+      const filter = this.value.toLowerCase();
+      document.querySelectorAll('.offer-card').forEach(card => {
+        const name = card.getAttribute('data-name').toLowerCase();
+        card.style.display = name.includes(filter) ? "" : "none";
+      });
+    });
+
+    /************ Countdown Timer ************/
+    function iniciarCountdown(element, durationHours) {
+      const durationMs = durationHours * 60 * 60 * 1000;
+      const targetTime = new Date().getTime() + durationMs;
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = targetTime - now;
+        if (distance < 0) {
+          element.textContent = "Oferta finalizada";
+          clearInterval(interval);
+          return;
+        }
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        element.textContent = `Tiempo restante: ${hours}h ${minutes}m ${seconds}s`;
+      }
+      updateCountdown();
+      const interval = setInterval(updateCountdown, 1000);
+    }
+    document.querySelectorAll('.countdown').forEach(el => {
+      const duration = parseInt(el.getAttribute('data-duration'));
+      iniciarCountdown(el, duration);
+    });
+
+    /************ Funcionalidad del Carrito ************/
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    function updateCartUI() {
+      const cartItemsEl = document.getElementById('cart-items');
+      const cartTotalEl = document.getElementById('cart-total');
+      cartItemsEl.innerHTML = "";
+      let total = 0;
+      cart.forEach((item, index) => {
+        total += item.price;
+        const li = document.createElement('li');
+        li.innerHTML = `${item.name} - $${item.price.toFixed(2)} <button class="remove-item" data-index="${index}" style="background:none; border:none; color:red; cursor:pointer;">×</button>`;
+        cartItemsEl.appendChild(li);
+      });
+      cartTotalEl.textContent = `Total: $${total.toFixed(2)}`;
+      localStorage.setItem('cart', JSON.stringify(cart));
+      document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const index = this.getAttribute('data-index');
+          cart.splice(index, 1);
+          updateCartUI();
+        });
+      });
+    }
+    updateCartUI();
+
+    // Agregar ofertas al carrito
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+      button.addEventListener('click', function() {
+        const card = this.closest('.offer-card');
+        const name = card.getAttribute('data-name');
+        const priceText = card.querySelector('.discounted-price').textContent;
+        const price = parseFloat(priceText.replace('$',''));
+        cart.push({ name, price });
+        updateCartUI();
+        alert(`${name} agregado al carrito`);
+      });
+    });
+
+    /************ Mostrar/Ocultar el Sidebar del Carrito ************/
+    const cartIcon = document.querySelector('.cart-icon');
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const closeCartBtn = document.querySelector('.close-cart');
+    cartIcon.addEventListener('click', () => {
+      cartSidebar.style.transform = "translateX(0)";
+    });
+    closeCartBtn.addEventListener('click', () => {
+      cartSidebar.style.transform = "translateX(100%)";
+    });
+
+    /************ Finalizar Compra ************/
+    document.getElementById('checkout-btn').addEventListener('click', () => {
+      const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
+      alert(`Compra finalizada. Total a pagar: $${totalAmount.toFixed(2)}`);
+      localStorage.removeItem('cart');
+      cart = [];
+      updateCartUI();
+      cartSidebar.style.transform = "translateX(100%)";
+      // Redirigir a la página de compras (compras.html)
+      window.location.href = 'compras.html';
+    });
+  </script>
+</body>
+</html>
